@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blockchain Todo DApp</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.8.1/dist/web3.min.js"></script>
+    <!-- Keep all your existing CSS styles -->
+    <style>
+        /* Your existing CSS styles remain exactly the same */
+    </style>
+</head>
+<body>
+    <!-- Your existing HTML structure remains exactly the same -->
+    
+    <script>
+        // Contract details will be set after deployment
+        let CONTRACT_ADDRESS = '';
+        let CONTRACT_ABI = [];
+        
+        // DOM Elements (same as before)
+        
+        // App State
+        let web3;
+        let contract;
+        let accounts = [];
+        let currentAccount = null;
+        let tasks = [];
+        
+        // Initialize the app
+        async function initApp() {
+            // Load contract data
+            await loadContractData();
+            
+            // Check if Web3 is injected by MetaMask
+            if (window.ethereum) {
+                web3 = new Web3(window.ethereum);
+                
+                try {
+                    // Request account access
+                    accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+                    currentAccount = accounts[0];
+                    updateAccountUI();
+                    
+                    // Initialize contract
+                    contract = new web3.eth.Contract(CONTRACT_ABI, CONTRACT_ADDRESS);
+                    
+                    // Load tasks
+                    await loadTasks();
+                    
+                    // Set up event listeners
+                    setupEventListeners();
+                    
+                    showNotification('Wallet connected successfully!', 'success');
+                } catch (error) {
+                    console.error('User denied account access:', error);
+                    showNotification('Wallet connection denied', 'error');
+                }
+            } else {
+                // Fallback to local provider (Ganache)
+                web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:7545'));
+                
+                try {
+                    accounts = await web3.eth.getAccounts();
+                    currentAccount = accounts[0];
+                    updateAccountUI();
+                    
+                    // Initialize contract
+                    contract = new web3.eth.Contract(CONTRACT_ABI, CONTRACT_ADDRESS);
+                    
+                    // Load tasks
+                    await loadTasks();
+                    
+                    // Set up event listeners
+                    setupEventListeners();
+                    
+                    showNotification('Connected to local Ganache network', 'success');
+                } catch (error) {
+                    console.error('Error connecting to local network:', error);
+                    showNotification('Failed to connect to local network', 'error');
+                }
+            }
+        }
+        
+        // Load contract data from build files
+        async function loadContractData() {
+            try {
+                const response = await fetch('/build/contracts/Todo.json');
+                const data = await response.json();
+                
+                CONTRACT_ABI = data.abi;
+                
+                // Get the deployed network address
+                const networkId = await web3.eth.net.getId();
+                CONTRACT_ADDRESS = data.networks[networkId].address;
+                
+                console.log('Contract address:', CONTRACT_ADDRESS);
+            } catch (error) {
+                console.error('Error loading contract data:', error);
+                showNotification('Failed to load contract data', 'error');
+            }
+        }
+        
+        // The rest of your JavaScript remains exactly the same
+        // (setupEventListeners, toggleAccountDropdown, closeAccountDropdown, etc.)
+        
+        // Initialize app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', initApp);
+        
+        // Expose functions to global scope for HTML onclick handlers
+        window.toggleTaskCompletion = toggleTaskCompletion;
+        window.deleteTask = deleteTask;
+    </script>
+</body>
+</html>

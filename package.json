@@ -1,0 +1,25 @@
+{
+  "name": "todo_blockchain.4",
+  "version": "1.0.0",
+  "description": "To-Do List dApp on Blockchain",
+  "main": "index.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "ganache-cli & truffle migrate && node server.js",
+    "test": "truffle test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/swanandi-bhende/todo_blockchain.4.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/swanandi-bhende/todo_blockchain.4/issues"
+  },
+  "homepage": "https://github.com/swanandi-bhende/todo_blockchain.4#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
